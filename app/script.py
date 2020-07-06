@@ -16,7 +16,7 @@ def create_soup(state):
 
 def get_state():
     print("What state ?")
-    state = str(input())
+    state = str(input().capitalize())
     return state
 
 def get_breeds():
