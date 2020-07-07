@@ -9,15 +9,18 @@ def welcome_screen():
     print(("*"*69)+"Welcome To Dog Scraper"+ ("*"*69))
     print("*" * 160)
 
-def create_soup(state):
+def create_soup(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    return soup
+
+def soup_find_breeds(state):
     print(f"Showing results for {state}")
     if(state == 'AUST & NZ'):
         url = f'https://www.dogzonline.com.au/breeds/puppies.asp'
     else:
         url = f'https://www.dogzonline.com.au/breeds/puppies.asp?state={state}'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    return soup
+    return create_soup(url)
 
 def get_state():
     states = {
@@ -58,12 +61,15 @@ def find_breed(breeds,soup):
     breeds_arr = []
     breeds_dict = {}
     for breed in breeds:
-        el = soup.find("a",string=breed, href=True)
-        url = f"https://www.dogzonline.com.au{el.get('href')}"
-        breeds_dict['breed'] = breed
-        breeds_dict['num'] = get_number(str(el.find_parent('li')))
-        breeds_dict['url'] = url
-        breeds_arr.append(breeds_dict.copy())
+        try:
+            el = soup.find("a",string=breed, href=True)
+            breeds_dict['breed'] = breed
+            breeds_dict['num'] = get_number(str(el.find_parent('li')))
+            breeds_dict['url'] = f"https://www.dogzonline.com.au{el.get('href')}"
+            breeds_arr.append(breeds_dict.copy())
+        except AttributeError:
+            print("Couldn't find the breed you are looking for, sorry!")
+            sys.exit()    
     return breeds_arr
 
 def print_dog_info(breeds):
@@ -77,7 +83,7 @@ def main():
     welcome_screen()
     state = get_state()
     arr = get_breeds()
-    soup = create_soup(state)
+    soup = soup_find_breeds(state)
     breeds_dict = find_breed(arr,soup)
     print_dog_info(breeds_dict)
 
