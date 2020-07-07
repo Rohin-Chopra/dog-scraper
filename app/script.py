@@ -43,8 +43,12 @@ def get_state():
     
 def get_breeds():
     breeds_arr = []
-    print("How many breeds ?")
-    num = int(input())
+    print("How many breeds ?")  
+    try:
+        num = int(input())
+    except ValueError:
+        print("Please enter a number")
+        sys.exit()
     for item in range(num):
         print("Type breed name ? ")
         breeds_arr.append(input())
@@ -73,7 +77,6 @@ def find_breed(breeds,soup):
     return breeds_arr
 
 def print_dog_info(breeds):
-    print(breeds)
     for item in breeds:
         print(f"{item.get('breed')} has {item.get('num')} listings.")
         print(item.get('url'))
